@@ -1,78 +1,58 @@
 # Rusty Template
 
-A deliberately small, runnable Rusty Engine downstream product reference. It
-has a Rust-owned admitted gameplay artifact, a pure TypeScript authoring DSL,
-a named Rust projection service, and one viewport-constrained browser surface
-with an Engine-owned canvas and a downstream UI label.
+Rusty Template is the smallest complete downstream Product Model. It is a
+working product shape, not a framework or a web application: Rust owns the
+admitted composition, live Product Kernel state, schedule/timeline results,
+content closure, and retained projection. TypeScript is limited to the
+build-time Runtime Composition authoring lane and the bounded DOM UI.
 
-It is a starting shape for a gameplay-driven product, not an Engine runtime or
-a browser-first game framework. See [the architecture](docs/architecture.md)
-and [change-placement guidance](docs/code-style.md).
+## Adjacent Engine checkout
 
-## Adjacent checkout bootstrap
+Place the Engine and product checkouts beside one another:
 
-Clone both public repositories under the same parent directory (the names
-matter because the dependency paths are deliberate):
+~~~text
+rusty-workspace/
+  rusty-engine/
+  rusty-template/
+~~~
 
-```bash
-git clone https://github.com/FuzzySlipper/rusty-engine.git rusty-engine
-git clone https://github.com/FuzzySlipper/rusty-template.git rusty-template
-cd rusty-template
-./scripts/bootstrap.sh
-pnpm --dir apps/web dev
-```
+The template consumes the public rusty CLI from the adjacent Engine checkout
+and the Engine-owned application-host artifact. It never clones, fetches,
+builds, pins, or mutates that checkout. Build the Engine's isolated Rules and
+Render artifacts there when they are missing, then run:
 
-Then open the printed local address. The browser app fetches only the
-already-exported Rust frame; it does not evaluate gameplay content.
-
-`./scripts/bootstrap.sh` checks for the adjacent Engine checkout and its public
-application-host artifact, installs this template's dependencies, materializes
-TypeScript authoring, and exports the Rust frame. It never writes to the sibling
-Engine checkout. If the public artifact is missing, build it explicitly there:
-
-```bash
-cd ../rusty-engine/render
-pnpm install
-pnpm build:application-host-artifact
-```
-
-Return to this repository afterward. This template intentionally does not
-fetch, clone, pin, or manage its sibling Engine checkout in source or CI.
-
-After creating a product from this template, rename the `rusty-template-*`
-Rust packages, npm packages, metadata tags, and visible sample text. Keep or
-update the sibling dependency paths deliberately; the Engine checkout itself
-is still expected at `../rusty-engine` relative to the repository root.
-
-## Verify
-
-```bash
+~~~bash
 ./scripts/verify.sh
-```
+~~~
 
-The script checks TypeScript authoring drift, Rust formatting/tests/lints,
-TypeScript, deterministic Rust frame export, Vite build, and real Chromium
-evidence at square and wide viewport shapes. It assumes the sibling public
-Engine artifact exists and does not run broad Engine verification.
+When this repository is being exercised from a separate worktree, set
+RUSTY_ENGINE_ROOT to the stable Engine checkout and RUSTY_CLI to its public
+rusty executable.
 
-## Ownership at a glance
+The verification script uses a disposable copy of this product. It admits and
+inspects the exact composition, builds and regenerates the Product Assembly
+byte-for-byte, checks package closure, and runs the public browser proof through
+one Engine canvas plus the bounded Product UI. The optional installed Tauri
+WebDriver proof is intentionally separate and is not implied by Chromium
+success.
 
-| Location | Owner | Does not own |
-| --- | --- | --- |
-| `crates/product-gameplay` | Product vocabulary and strict admission | Generic Engine grammar or a TS evaluator |
-| `crates/product-runtime` | Product service and retained-frame projection | Browser, DOM, WebGL, or host lifecycle |
-| `crates/product-export` | Static initial-frame export | Live game runtime or server |
-| `gameplay/authoring` | Pure build-time composition/materialization | New serialized meaning or gameplay state |
-| `apps/web` | Public host composition and local UI | Canvas, renderer, live gameplay state, or persistence |
+## Layout
 
-For provider-level guidance, use the remote, portable documents:
+~~~text
+rusty.toml                 product identity and host policy
+rules/main.ts              pure Runtime Composition authoring
+kernel/entry.rs            Product Kernel authority and transaction
+ui/main.ts                 bounded observational DOM UI
+content/                   declared product-owned runtime resources
+generated/.keep            ignored CLI receipts and generated closure
+scripts/verify.sh          disposable public-CLI acceptance gate
+docs/architecture.md       ownership and workflow notes
+~~~
 
-- [Downstream repository bootstrap](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/downstream-repository-bootstrap.md)
-- [Greenfield downstream product path](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/greenfield-downstream-product.md)
-- [Downstream renderer and Studio boundary](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/downstream-renderer-and-studio.md)
-- [Rusty Engine design](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/design.md)
+The sample counter is deliberately small but complete: physical W and the
+DOM button claim one typed increment intent, Engine runs the standard
+observe-pairs capability and recurring schedule, the Product Kernel queues
+mutation operations, and a finite timeline contributes its own result. UI
+projection remains observational.
 
-When working in an adjacent local checkout, agents may read
-`../rusty-engine/docs/topics/development/greenfield-downstream-product.md`.
-That relative filesystem path is intentionally prose rather than the sole
-Markdown link because it is not portable to GitHub.
+For the provider contract, read the [downstream repository bootstrap](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/downstream-repository-bootstrap.md), [greenfield product path](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/greenfield-downstream-product.md), [renderer and Studio boundary](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/downstream-renderer-and-studio.md), and [Rusty Engine design](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/design.md).

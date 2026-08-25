@@ -1,7 +1,9 @@
+# Generated Product Model receipts and materialized runtime closure.
+/generated/*
+!/generated/.keep
+
+# Local tool output from optional host/browser work.
 target/
 node_modules/
-apps/web/node_modules/
-apps/web/dist/
 playwright-report/
 test-results/
-

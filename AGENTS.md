@@ -2,61 +2,74 @@
 
 ## Purpose
 
-This is a small, runnable reference downstream product for Rusty Engine. It
-shows a Rust-owned gameplay/content admission path, an optional TypeScript
-authoring DSL, and a single bounded browser viewport through the Engine public
-application host. It is not a framework, a generic game template, or an
-Engine implementation checkout.
+This repository is a small, runnable downstream Product Model reference. It
+is not an Engine implementation, generic game framework, or web application.
+The adjacent Rusty Engine checkout is the provider and is consumed through its
+public CLI and published application-host artifacts.
 
-Read the local sibling bootstrap when available:
-`../rusty-engine/docs/topics/development/downstream-repository-bootstrap.md`.
-For GitHub or other remote agents, use the canonical bootstrap at
-<https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/downstream-repository-bootstrap.md>,
-then continue with the
-[greenfield product guide](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/greenfield-downstream-product.md).
-Local relative paths are useful in an adjacent checkout but are not portable
-Markdown links on GitHub.
+Read the Engine's portable downstream guidance when available:
+
+- downstream repository bootstrap
+- greenfield downstream product path
+- downstream renderer and Studio boundary
 
 ## Authority
 
-Rust owns the product's admitted gameplay vocabulary, semantic interpretation,
-render-frame projection, and any future live service state. The TypeScript in
-`gameplay/authoring` is a pure build-time materializer for a Rust-defined wire
-format. The TypeScript in `apps/web` loads an already Rust-projected frame and
-owns only bounded DOM presentation/input adaptation.
+- Rust Product Kernel code in kernel/entry.rs owns live product facts, meaning,
+  mutation planning, transaction publication, and retained UI projection.
+- Engine owns structural composition admission, input/lifecycle/schedule/timeline
+  mechanisms, standard capability execution, and host transport.
+- rules/main.ts is pure build-time authoring for the Rust-owned Runtime
+  Composition wire contract. It is not an evaluator, scheduler, save model, or
+  live state store.
+- ui/main.ts is bounded DOM presentation and typed intent adaptation. It
+  observes the Product Kernel projection and never mutates product state,
+  creates a second canvas, or imports renderer internals.
+- content/ contains declared product-owned resources. generated/ contains
+  ignored Engine receipts and generated closure only.
 
-Do not add a TypeScript evaluator, live game state, save model, scheduler,
-generic command bus, browser storage authority, a second canvas, or a private
-Engine renderer import. A later live browser or Tauri product replaces the
-static export adapter with one named Rust product service; it does not move
-gameplay meaning into TypeScript.
+Do not add a browser storage authority, generic command bus, TypeScript runtime
+evaluator, private Engine import, second renderer/canvas, or product scheduler.
 
 ## Engine boundary
 
-The sibling Engine path is required for development:
-
-- Rust depends only on `../rusty-engine/rust/crates/rusty-engine`.
-- Browser code depends only on the public
-  `@rusty-engine/application-host` artifact at
-  `../rusty-engine/render/artifacts/application-host`.
-
-Do not clone, fetch, pin, or manage Engine from this template's source or CI.
-An operator creates adjacent sibling checkouts. Never deep-import Engine
-`src/` trees or renderer packages.
+The sibling Engine checkout must remain adjacent at ../rusty-engine for local
+verification. This repository must not clone, fetch, pin, build, reset, or
+otherwise mutate it. Use the public rusty CLI from that checkout and the
+published application-host/product-browser-host artifacts.
+For a separate task worktree, RUSTY_ENGINE_ROOT and RUSTY_CLI may point at the
+stable Engine checkout and its public CLI without changing product source.
 
 ## Layout
 
-- `crates/product-gameplay`: strict product content schema and admission.
-- `crates/product-runtime`: named Rust service and renderer-neutral frame projection.
-- `crates/product-export`: static development/export adapter only.
-- `gameplay/authoring`: pure TypeScript builders that materialize committed content.
-- `content/gameplay`: admitted product artifact, not a TypeScript runtime input.
-- `apps/web`: thin Vite composition root, one Engine canvas, bounded UI root.
+~~~text
+rusty.toml       product identity, lifecycle, UI projection, content, wrappers
+rules/main.ts    pure Runtime Composition authoring
+kernel/entry.rs  concrete Product Kernel and mutation planner
+ui/main.ts       bounded DOM UI and typed intent claim
+content/         declared runtime resources and manifest
+generated/       ignored CLI receipts (only .keep is source)
+scripts/         disposable public-CLI verification
+docs/            compact architecture notes
+~~~
+
+Product identity, application ID, title, and storage namespace are deliberately
+template-specific. A product created from this repository must rename them
+before publishing.
 
 ## Verification
 
-Run `./scripts/verify.sh` from the repository root after `pnpm install`. It
-checks authoring drift, Rust formatting/tests/lints, TypeScript, the Rust frame
-export, web build, and a real Chromium viewport proof. It assumes the sibling
-Engine application-host artifact already exists; build that artifact in the
-Engine checkout only when it is absent or intentionally changed.
+From the repository root, run:
+
+~~~bash
+./scripts/verify.sh
+~~~
+
+The gate uses a disposable product copy and the adjacent stable Engine CLI. It
+checks admission, inspection, Product Assembly generation, byte-identical
+delete/regenerate behavior, package closure, and Chromium browser evidence.
+The browser proof is not packaged Tauri/WebDriver proof; select that separately
+only in an environment with the native prerequisites.
+
+Keep generated outputs untracked. Do not add Cargo, Vite, npm, or Engine host
+machinery to this repository merely to make the sample convenient.

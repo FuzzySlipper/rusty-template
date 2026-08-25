@@ -1,34 +1,32 @@
-# Template architecture
+# Product Layout
 
-The template demonstrates a small downstream ownership slice rather than a
-universal game grammar:
+This template is a complete vertical through the public Engine Product Model:
 
-```text
-TypeScript pure builders
-  -> content/gameplay/sample-scene.json (committed canonical product artifact)
-  -> Rust strict decode and product admission
-  -> named Rust product service
-  -> RenderFrameDiff JSON export
-  -> public Engine application host
-  -> one Engine canvas plus bounded downstream UI root
-```
+~~~text
+rules/main.ts
+  -> Rusty CLI admission and canonical composition
+  -> kernel/entry.rs Product Kernel
+  -> Engine schedule, standard capability, input, lifecycle, and timeline lanes
+  -> Product Assembly and declared content closure
+  -> Product Browser Host
+  -> one Engine canvas plus bounded ui/main.ts DOM projection
+~~~
 
-`AuthoredScene` is a closed product format. Rust rejects unknown fields,
-unsupported schema versions, non-finite or out-of-range colors/scales, and bad
-labels before it creates product meaning. The TypeScript source merely lowers
-one readable authored form to that Rust-owned format; it cannot run in play or
-evaluate a cube.
+The Rust Product Kernel is the only owner of the counter's live facts and
+mutation transaction. It gathers source-linked entity facts for the standard
+runtime.observe-pairs capability, queues typed operation receipts, and
+projects counter.v1. Engine owns the structural lifecycle, input admission,
+schedule ordering, timeline release, and host transport; the product owns
+meaning and mutation planning.
 
-The exporter is deliberately a static development edge. It exists so a fresh
-template can render a browser frame without claiming that HTTP or a game server
-is fundamental. A real product replaces it with one named Rust service plus a
-chosen typed host adapter. Its application frame keeps all canvas and UI
-geometry within the browser/WebView viewport so that the DOM shell does not
-become an accidental web-app authority.
+rules/main.ts is pure build-time authoring. It lowers to the Rust-owned
+Runtime Composition contract and cannot evaluate, schedule, persist, or mutate
+anything in play. ui/main.ts claims the same typed increment intent as the
+physical W mapping and observes the Rust projection; it does not own a second
+canvas, renderer, state store, or browser authority.
 
-Related Engine documents:
-
-- [Greenfield downstream product path](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/greenfield-downstream-product.md)
-- [Downstream renderer and Studio boundary](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/downstream-renderer-and-studio.md)
-- [Rust code style](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/rust-style.md)
-
+generated/ is an ignored receipt lane. A clean product source contains only
+the manifest, authoring, kernel, UI, and declared content. scripts/verify.sh
+uses the public adjacent Engine CLI against a disposable copy so source
+validation, deterministic Assembly regeneration, package closure, and browser
+evidence remain separate from product source.
