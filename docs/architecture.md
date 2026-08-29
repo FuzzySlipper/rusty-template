@@ -1,32 +1,57 @@
-# Product Layout
+# Current product architecture
 
-This template is a complete vertical through the public Engine Product Model:
+Rusty Template is an ordinary managed C# product loaded by Rusty Engine's
+NativeAOT product runtime:
 
-~~~text
-rules/main.ts
-  -> Rusty CLI admission and canonical composition
-  -> kernel/entry.rs Product Kernel
-  -> Engine schedule, standard capability, input, lifecycle, and timeline lanes
-  -> Product Assembly and declared content closure
-  -> Product Browser Host
-  -> one Engine canvas plus bounded ui/main.ts DOM projection
-~~~
+```text
+C# counter state and product lifecycle
+  -> Rusty.Engine safe service surface
+  -> generated NativeProduct bootstrap and ABI
+  -> Rust Engine lifecycle, input, UI transport, and host
+  -> Engine browser host plus DOM-only product UI
+```
 
-The Rust Product Kernel is the only owner of the counter's live facts and
-mutation transaction. It gathers source-linked entity facts for the standard
-runtime.observe-pairs capability, queues typed operation receipts, and
-projects counter.v1. Engine owns the structural lifecycle, input admission,
-schedule ordering, timeline release, and host transport; the product owns
-meaning and mutation planning.
+The arrows describe cooperation, not a second product authority. C# decides
+what an increment means and owns the counter value. Engine admits update facts
+and typed direct input, and transports the product's UI projection to the
+browser. The product never owns a renderer, canvas, browser state store, or
+clock.
 
-rules/main.ts is pure build-time authoring. It lowers to the Rust-owned
-Runtime Composition contract and cannot evaluate, schedule, persist, or mutate
-anything in play. ui/main.ts claims the same typed increment intent as the
-physical W mapping and observes the Rust projection; it does not own a second
-canvas, renderer, state store, or browser authority.
+## Source owners
 
-generated/ is an ignored receipt lane. A clean product source contains only
-the manifest, authoring, kernel, UI, and declared content. scripts/verify.sh
-uses the public adjacent Engine CLI against a disposable copy so source
-validation, deterministic Assembly regeneration, package closure, and browser
-evidence remain separate from product source.
+| Path | Owner | Role |
+| --- | --- | --- |
+| `src/RustyTemplate.Game/` | C# product | Counter state, input interpretation, and projection facts. |
+| `src/RustyTemplate.NativeProduct/` | Engine generator integration | One assembly selection attribute and project references only. |
+| `src/ui/main.js` | C# product UI lane | DOM button and counter label; no game state or rendering. |
+| `scripts/generate-browser-bundle.mjs` | Product tooling | Combines the Engine browser host with the static UI module. |
+| `content/` | Product/host | Currently empty; retained as the explicit host content root. |
+
+The generated C# contracts, raw bindings, native bootstrap, and browser host
+artifacts are Engine-owned outputs. They are ignored or consumed from the
+adjacent Engine checkout and are not manually edited here.
+
+## Lifecycle and data flow
+
+1. The Engine runtime loads the published NativeAOT library and invokes its
+   generated product bind/create path.
+2. The product constructor receives `ProductCreateContext` and opens one typed
+   UI stream through `IEngineContext.Ui`.
+3. Engine calls `Start`, then sends admitted `ProductUpdate` values. A DOM
+   button claims the configured `increment` direct intent; C# interprets each
+   active direct-digital event and updates its own counter.
+4. C# publishes a small typed `UiValue` object through the Engine UI service.
+   The DOM module observes the projection and updates its local label.
+5. Engine owns pause/resume/restart/shutdown admission, the browser host, and
+   any canvas or renderer resources. Product `Dispose` releases its UI stream.
+
+There is no runtime composition file, Product Model kernel, downstream Rust
+crate, TypeScript gameplay evaluator, JSON invocation protocol, second loop,
+or handwritten ABI in the current path.
+
+## Evidence boundary
+
+The useful proof for this repository is that the managed product compiles and
+the NativeAOT composition publishes for `linux-x64`. Browser or interactive
+parity testing is deliberately outside this small migration task; the runner
+exists for local exploration after those focused checks pass.

@@ -1,8 +1,10 @@
-# Generated Product Model receipts and materialized runtime closure.
-/generated/*
-!/generated/.keep
+# Generated C# build and browser-host output.
+/src/**/bin/
+/src/**/obj/
+/src/ui/generated/
 
-# Local tool output from optional host/browser work.
+# Local runtime and package output.
+.runtime/
 target/
 node_modules/
 playwright-report/

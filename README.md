@@ -1,58 +1,66 @@
 # Rusty Template
 
-Rusty Template is the smallest complete downstream Product Model. It is a
-working product shape, not a framework or a web application: Rust owns the
-admitted composition, live Product Kernel state, schedule/timeline results,
-content closure, and retained projection. TypeScript is limited to the
-build-time Runtime Composition authoring lane and the bounded DOM UI.
+Rusty Template is a deliberately small downstream NativeAOT C# product. Its
+counter state and application behavior live in safe C#; Rusty Engine supplies
+the lifecycle, update loop, typed input, UI projection transport, and host.
 
-## Adjacent Engine checkout
+> The product decides. The Engine guarantees.
 
-Place the Engine and product checkouts beside one another:
+The former Rust Product Model, TypeScript runtime-composition, and public
+`rusty` CLI lanes have been retired. They remain available in Git history as
+examples of an earlier architecture, not as supported source to extend.
 
-~~~text
-rusty-workspace/
+## Repository shape
+
+```text
+src/
+  RustyTemplate.Game/          safe C# counter/product logic
+  RustyTemplate.NativeProduct/ thin NativeAOT composition project
+  ui/                          DOM-only companion and browser bundle script
+content/                       empty product content root for the Engine host
+scripts/
+  build-csharp.sh              focused managed build and NativeAOT publish
+  generate-browser-bundle.mjs Engine host plus DOM UI bundle helper
+  run-csharp.sh                direct Engine-hosted product runner
+docs/architecture.md           current ownership and lifecycle notes
+```
+
+Keep this repository beside the Engine checkout:
+
+```text
+dev/
   rusty-engine/
   rusty-template/
-~~~
+```
 
-The template consumes the public rusty CLI from the adjacent Engine checkout
-and the Engine-owned application-host artifact. It never clones, fetches,
-builds, pins, or mutates that checkout. Build the Engine's isolated Rules and
-Render artifacts there when they are missing, then run:
+The product project resolves the Engine through `EngineRoot`, which may be
+overridden for a deliberate checkout. It does not clone, fetch, pin, or
+mutate that checkout.
 
-~~~bash
-./scripts/verify.sh
-~~~
+## Build and run
 
-When this repository is being exercised from a separate worktree, set
-RUSTY_ENGINE_ROOT to the stable Engine checkout and RUSTY_CLI to its public
-rusty executable.
+Run the focused checks from the repository root:
 
-The verification script uses a disposable copy of this product. It admits and
-inspects the exact composition, builds and regenerates the Product Assembly
-byte-for-byte, checks package closure, and runs the public browser proof through
-one Engine canvas plus the bounded Product UI. The optional installed Tauri
-WebDriver proof is intentionally separate and is not implied by Chromium
-success.
+```bash
+./scripts/build-csharp.sh
+```
 
-## Layout
+To start the Engine's standard browser host after publishing:
 
-~~~text
-rusty.toml                 product identity and host policy
-rules/main.ts              pure Runtime Composition authoring
-kernel/entry.rs            Product Kernel authority and transaction
-ui/main.ts                 bounded observational DOM UI
-content/                   declared product-owned runtime resources
-generated/.keep            ignored CLI receipts and generated closure
-scripts/verify.sh          disposable public-CLI acceptance gate
-docs/architecture.md       ownership and workflow notes
-~~~
+```bash
+./scripts/run-csharp.sh --port 8787
+```
 
-The sample counter is deliberately small but complete: physical W and the
-DOM button claim one typed increment intent, Engine runs the standard
-observe-pairs capability and recurring schedule, the Product Kernel queues
-mutation operations, and a finite timeline contributes its own result. UI
-projection remains observational.
+The runner generates an ignored browser bundle, publishes the NativeAOT
+library, and starts `csharp-product-runtime` with one direct typed `increment`
+intent. The DOM button claims that intent and observes the product's typed
+counter projection. The browser host and any canvas remain Engine-owned.
 
-For the provider contract, read the [downstream repository bootstrap](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/downstream-repository-bootstrap.md), [greenfield product path](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/greenfield-downstream-product.md), [renderer and Studio boundary](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/topics/development/downstream-renderer-and-studio.md), and [Rusty Engine design](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/design.md).
+## Working on the product
+
+Read [`AGENTS.md`](AGENTS.md), the adjacent Engine's C# SDK guidance, and
+[`docs/architecture.md`](docs/architecture.md). Keep product logic in
+`RustyTemplate.Game`, keep `NativeProduct` thin, and use named generated
+Engine services. If an Engine capability is missing, record the upstream need
+and stop instead of adding Rust, browser logic, a JSON bridge, or handwritten
+interop downstream.

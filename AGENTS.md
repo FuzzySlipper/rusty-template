@@ -1,75 +1,49 @@
-# Rusty Template agent guidance
+# Rusty Template C# downstream guidance
 
-## Purpose
+## Direction and ownership
 
-This repository is a small, runnable downstream Product Model reference. It
-is not an Engine implementation, generic game framework, or web application.
-The adjacent Rusty Engine checkout is the provider and is consumed through its
-public CLI and published application-host artifacts.
+Rusty Template is a small, ordinary NativeAOT C# product hosted by the
+adjacent `/home/dev/rusty-engine` checkout. The C# product is the only local
+game/runtime lane. The old Rust Product Model kernel, TypeScript composition
+authoring, and `rusty` CLI workflow are retired; Git history is donor material
+only.
 
-Read the Engine's portable downstream guidance when available:
+> The product decides. The Engine guarantees.
 
-- downstream repository bootstrap
-- greenfield downstream product path
-- downstream renderer and Studio boundary
+- C# owns the counter's application logic, state, meaning, and product UI
+  facts.
+- Rusty Engine owns lifecycle and update admission, input delivery, UI
+  projection transport, renderer/host integration, and other named Engine
+  mechanisms.
+- TypeScript is limited to the DOM companion. It must not render game
+  elements, retain gameplay state, or create a second loop or transport.
+- Do not add downstream Rust, Product Model, runtime composition authoring,
+  JSON invocation, handwritten ABI/P/Invoke, or a private scheduler.
 
-## Authority
+Read the adjacent Engine's `AGENTS.md`, `docs/architecture.md`, and
+`docs/csharp-sdk.md` before changing the product/Engine boundary.
 
-- Rust Product Kernel code in kernel/entry.rs owns live product facts, meaning,
-  mutation planning, transaction publication, and retained UI projection.
-- Engine owns structural composition admission, input/lifecycle/schedule/timeline
-  mechanisms, standard capability execution, and host transport.
-- rules/main.ts is pure build-time authoring for the Rust-owned Runtime
-  Composition wire contract. It is not an evaluator, scheduler, save model, or
-  live state store.
-- ui/main.ts is bounded DOM presentation and typed intent adaptation. It
-  observes the Product Kernel projection and never mutates product state,
-  creates a second canvas, or imports renderer internals.
-- content/ contains declared product-owned resources. generated/ contains
-  ignored Engine receipts and generated closure only.
+## Source lanes
 
-Do not add a browser storage authority, generic command bus, TypeScript runtime
-evaluator, private Engine import, second renderer/canvas, or product scheduler.
+- `src/RustyTemplate.Game/` is ordinary safe C# product code. It references
+  the generated safe `Rusty.Engine` SDK and owns the counter domain.
+- `src/RustyTemplate.NativeProduct/` is the thin NativeAOT composition project.
+  Its assembly attribute selects the product; the Engine source generator
+  owns exports and ABI plumbing. Do not add gameplay or handwritten interop
+  there.
+- `src/ui/` contains only static/DOM UI. The Engine browser host owns the
+  canvas, renderer, and host input delivery.
 
-## Engine boundary
+Generated and intermediate output belongs under ignored build directories.
+The generated C# inputs are never edited or committed.
 
-The sibling Engine checkout must remain adjacent at ../rusty-engine for local
-verification. This repository must not clone, fetch, pin, build, reset, or
-otherwise mutate it. Use the public rusty CLI from that checkout and the
-published application-host/product-browser-host artifacts.
-For a separate task worktree, RUSTY_ENGINE_ROOT and RUSTY_CLI may point at the
-stable Engine checkout and its public CLI without changing product source.
+## Missing capabilities and evidence
 
-## Layout
+If the safe generated Engine API cannot express a needed mechanism, name the
+exact upstream capability, file or link its Engine task when authorized, and
+stop. Do not invent a downstream substitute merely to complete the task.
 
-~~~text
-rusty.toml       product identity, lifecycle, UI projection, content, wrappers
-rules/main.ts    pure Runtime Composition authoring
-kernel/entry.rs  concrete Product Kernel and mutation planner
-ui/main.ts       bounded DOM UI and typed intent claim
-content/         declared runtime resources and manifest
-generated/       ignored CLI receipts (only .keep is source)
-scripts/         disposable public-CLI verification
-docs/            compact architecture notes
-~~~
-
-Product identity, application ID, title, and storage namespace are deliberately
-template-specific. A product created from this repository must rename them
-before publishing.
-
-## Verification
-
-From the repository root, run:
-
-~~~bash
-./scripts/verify.sh
-~~~
-
-The gate uses a disposable product copy and the adjacent stable Engine CLI. It
-checks admission, inspection, Product Assembly generation, byte-identical
-delete/regenerate behavior, package closure, and Chromium browser evidence.
-The browser proof is not packaged Tauri/WebDriver proof; select that separately
-only in an environment with the native prerequisites.
-
-Keep generated outputs untracked. Do not add Cargo, Vite, npm, or Engine host
-machinery to this repository merely to make the sample convenient.
+Use only focused evidence for the active change: a managed product build and
+NativeAOT publish are sufficient for this template. Do not revive the removed
+Product Model/browser verification gate or add broad tests and proof ceremony.
+Preserve unrelated work and never mutate the adjacent Engine checkout.
