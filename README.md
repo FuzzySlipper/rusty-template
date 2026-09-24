@@ -1,66 +1,80 @@
 # Rusty Template
 
-Rusty Template is a deliberately small downstream NativeAOT C# product. Its
-counter state and application behavior live in safe C#; Rusty Engine supplies
-the lifecycle, update loop, typed input, UI projection transport, and host.
+A minimal Rusty Engine product: C# owns a counter, a DOM button sends an
+`increment` intent, and Engine transports the counter projection to the UI.
+The packaged Engine owns the host, input, update loop, and browser shell.
 
-> The product decides. The Engine guarantees.
+## Setup
 
-The former Rust Product Model, TypeScript runtime-composition, and public
-`rusty` CLI lanes have been retired. They remain available in Git history as
-examples of an earlier architecture, not as supported source to extend.
-
-## Repository shape
-
-```text
-src/
-  RustyTemplate.Game/          safe C# counter/product logic
-  RustyTemplate.NativeProduct/ thin NativeAOT composition project
-  ui/                          DOM-only companion and browser bundle script
-content/                       empty product content root for the Engine host
-scripts/
-  build-csharp.sh              focused managed build and NativeAOT publish
-  generate-browser-bundle.mjs Engine host plus DOM UI bundle helper
-  run-csharp.sh                direct Engine-hosted product runner
-docs/architecture.md           current ownership and lifecycle notes
-```
-
-Keep this repository beside the Engine checkout:
-
-```text
-dev/
-  rusty-engine/
-  rusty-template/
-```
-
-The product project resolves the Engine through `EngineRoot`, which may be
-overridden for a deliberate checkout. It does not clone, fetch, pin, or
-mutate that checkout.
-
-## Build and run
-
-Run the focused checks from the repository root:
+The supported runtime pair targets Linux x64. Install the .NET 10 SDK, GitHub
+CLI (`gh`, authenticated for release access), `jq`, `tar`, `unzip`, and standard shell
+utilities. NativeAOT also needs the platform compiler/linker prerequisites
+(Clang and zlib development headers on Linux).
 
 ```bash
+./scripts/install-engine.sh
 ./scripts/build-csharp.sh
-```
-
-To start the Engine's standard browser host after publishing:
-
-```bash
 ./scripts/run-csharp.sh --port 8787
 ```
 
-The runner generates an ignored browser bundle, publishes the NativeAOT
-library, and starts `csharp-product-runtime` with one direct typed `increment`
-intent. The DOM button claims that intent and observes the product's typed
-counter projection. The browser host and any canvas remain Engine-owned.
+Open the URL printed by the host. The Increment button changes the counter.
+The runner delegates to the installed `rusty dev`: CoreCLR loads the product,
+and changes to declared C#, UI, or content inputs rebuild and restart it.
+Runtime options such as `--bind-host`, `--live-debug`, and `--debugger` pass
+through to `rusty dev`.
 
-## Working on the product
+The installer downloads and verifies the immutable SDK/runtime pair pinned in
+`Directory.Build.props`. NuGet resolves the SDK from `.runtime/sdk-feed`; the
+runner selects the same version under `.runtime/pairs/`. No Engine source
+checkout is required. Installed artifacts are local, ignored output.
 
-Read [`AGENTS.md`](AGENTS.md), the adjacent Engine's C# SDK guidance, and
-[`docs/architecture.md`](docs/architecture.md). Keep product logic in
-`RustyTemplate.Game`, keep `NativeProduct` thin, and use named generated
-Engine services. If an Engine capability is missing, record the upstream need
-and stop instead of adding Rust, browser logic, a JSON bridge, or handwritten
-interop downstream.
+To adopt the newest published pair deliberately:
+
+```bash
+./scripts/install-engine.sh --update
+./scripts/build-csharp.sh
+```
+
+The pin changes only after successful installation. Include
+`Directory.Build.props` in the resulting source change. For an explicit
+NativeAOT fidelity/release check:
+
+```bash
+./scripts/build-csharp.sh --aot
+```
+
+## Repository shape
+
+| Path | Responsibility |
+| --- | --- |
+| `src/RustyTemplate.Game/` | Ordinary safe C# product, counter state, and product metadata |
+| `src/ui/main.js` | DOM presentation and semantic input |
+| `content/` | Product-authored content root |
+| `Directory.Build.props` | Matched Engine SDK/runtime pin |
+| `scripts/` | Install, build/stage, and development commands |
+| `docs/architecture.md` | Current ownership and data flow |
+| `docs/ui.md` | DOM companion contract |
+| `docs/agent-review/` | Reusable review workflow and lane packets |
+
+The SDK generates CoreCLR/NativeAOT composition beneath `obj/`. The runtime
+pack supplies the browser shell. Product metadata, input intents, content/UI
+roots, and projection identity live in the ordinary `.csproj`.
+
+## Start a product from this template
+
+1. Rename the C# directory/project, namespace, and entry type together. Update
+   the project path in the build/run scripts.
+2. Set the product ID/title and UI projection stream/contract in the project
+   file. Keep the C# stream/contract constants aligned. Define semantic intents
+   there and keep their C#/DOM callers aligned.
+3. Replace the counter domain and DOM UI with the product's behavior. Add
+   authored data under `content/` and load it through Engine services. Keep
+   documentation outside `src/ui/`; every file there is staged as a web asset.
+4. Customize `AGENTS.md` and the architecture owner map for the actual product.
+   Add a Den project or donor contract only if the new project uses one.
+5. Keep the generic review lanes, adding concrete owner pointers and relevant
+   task-specific questions as described in [the review guide](docs/agent-review/README.md).
+
+Read [AGENTS.md](AGENTS.md) before extending the product. Keep instructions
+about current behavior and ownership; exact dependency identities belong in
+configuration, and task status belongs in the task system.

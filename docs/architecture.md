@@ -1,57 +1,55 @@
-# Current product architecture
+# Product architecture
 
-Rusty Template is an ordinary managed C# product loaded by Rusty Engine's
-NativeAOT product runtime:
+> The product decides. The Engine guarantees.
 
 ```text
-C# counter state and product lifecycle
-  -> Rusty.Engine safe service surface
-  -> generated NativeProduct bootstrap and ABI
-  -> Rust Engine lifecycle, input, UI transport, and host
-  -> Engine browser host plus DOM-only product UI
+Counter state and policy (C#)
+  -> Rusty.Engine safe SDK
+  -> SDK-generated composition and ABI
+  -> packaged Rust host, input, UI transport, and browser shell
+  -> DOM companion
 ```
 
-The arrows describe cooperation, not a second product authority. C# decides
-what an increment means and owns the counter value. Engine admits update facts
-and typed direct input, and transports the product's UI projection to the
-browser. The product never owns a renderer, canvas, browser state store, or
-clock.
+## Owners
 
-## Source owners
-
-| Path | Owner | Role |
-| --- | --- | --- |
-| `src/RustyTemplate.Game/` | C# product | Counter state, input interpretation, and projection facts. |
-| `src/RustyTemplate.NativeProduct/` | Engine generator integration | One assembly selection attribute and project references only. |
-| `src/ui/main.js` | C# product UI lane | DOM button and counter label; no game state or rendering. |
-| `scripts/generate-browser-bundle.mjs` | Product tooling | Combines the Engine browser host with the static UI module. |
-| `content/` | Product/host | Currently empty; retained as the explicit host content root. |
-
-The generated C# contracts, raw bindings, native bootstrap, and browser host
-artifacts are Engine-owned outputs. They are ignored or consumed from the
-adjacent Engine checkout and are not manually edited here.
+| Path or service | Responsibility |
+| --- | --- |
+| `src/RustyTemplate.Game/Counter/CounterState.cs` | Counter value, increment saturation, and reset policy |
+| `src/RustyTemplate.Game/RustyTemplateProduct.cs` | Lifecycle callbacks, semantic input interpretation, and counter projection |
+| `src/RustyTemplate.Game/RustyTemplate.Game.csproj` | Explicit product entry, content/UI roots, intents, and host defaults |
+| `src/ui/main.js` | DOM button/label, intent submission, projection subscription, and UI cleanup |
+| `content/` | Product-authored data |
+| Engine SDK/runtime | Generated interop, admitted updates/input, retained UI transport, host, renderer, and browser shell |
 
 ## Lifecycle and data flow
 
-1. The Engine runtime loads the published NativeAOT library and invokes its
-   generated product bind/create path.
-2. The product constructor receives `ProductCreateContext` and opens one typed
-   UI stream through `IEngineContext.Ui`.
-3. Engine calls `Start`, then sends admitted `ProductUpdate` values. A DOM
-   button claims the configured `increment` direct intent; C# interprets each
-   active direct-digital event and updates its own counter.
-4. C# publishes a small typed `UiValue` object through the Engine UI service.
-   The DOM module observes the projection and updates its local label.
-5. Engine owns pause/resume/restart/shutdown admission, the browser host, and
-   any canvas or renderer resources. Product `Dispose` releases its UI stream.
+The installed runtime loads SDK-generated CoreCLR composition. Its bind checks
+the SDK/runtime ABI identity and constructs the product with
+`ProductCreateContext`. The product opens its UI stream through `IEngineContext.Ui`.
 
-There is no runtime composition file, Product Model kernel, downstream Rust
-crate, TypeScript gameplay evaluator, JSON invocation protocol, second loop,
-or handwritten ABI in the current path.
+Engine calls `Start` and admits `ProductUpdate` callbacks. The DOM button
+submits the declared `increment` intent. C# interprets active direct-digital
+input, updates its counter, and publishes a typed `UiValue`. The DOM observes
+that projection and displays its number; it holds no authoritative counter.
 
-## Evidence boundary
+Engine owns pause/resume/restart/shutdown admission. Product callbacks apply
+local policy, such as resetting the counter on restart. Disposal releases the
+UI stream. Resource lifetimes and admitted update facts remain Engine-owned.
 
-The useful proof for this repository is that the managed product compiles and
-the NativeAOT composition publishes for `linux-x64`. Browser or interactive
-parity testing is deliberately outside this small migration task; the runner
-exists for local exploration after those focused checks pass.
+## Build and host
+
+`Directory.Build.props` selects one immutable SDK/runtime pair. The installer
+uses the release's verifier; `NuGet.Config` points at its installed SDK feed.
+The product's package reference supplies the public services and build targets.
+Generated bindings and composition are ignored output, never edited sources.
+
+The build script compiles and stages CoreCLR through
+`StageRustyEngineCoreClrProduct`. The run script invokes the matching pack's
+`rusty dev`, which owns staging, watching, worker replacement, and serving.
+`VerifyRustyEngineAot` publishes NativeAOT for explicit fidelity/release checks.
+The product supplies only its C#, DOM UI, and content; browser assets and
+transport come from the runtime pack.
+
+Before adding a mechanism, check both the installed safe SDK and the owners
+above. Product meaning stays downstream. A missing Engine capability is an
+upstream request, not another local host, transport, scheduler, or renderer.

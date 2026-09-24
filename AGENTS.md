@@ -1,49 +1,100 @@
-# Rusty Template C# downstream guidance
+# Rusty Template agent guidance
 
-## Direction and ownership
-
-Rusty Template is a small, ordinary NativeAOT C# product hosted by the
-adjacent `/home/dev/rusty-engine` checkout. The C# product is the only local
-game/runtime lane. The old Rust Product Model kernel, TypeScript composition
-authoring, and `rusty` CLI workflow are retired; Git history is donor material
-only.
+Rusty Template is a minimal C# counter product and starting point for downstream
+Rusty Engine projects. Keep it small enough to understand and customize.
 
 > The product decides. The Engine guarantees.
 
-- C# owns the counter's application logic, state, meaning, and product UI
-  facts.
-- Rusty Engine owns lifecycle and update admission, input delivery, UI
-  projection transport, renderer/host integration, and other named Engine
-  mechanisms.
-- TypeScript is limited to the DOM companion. It must not render game
-  elements, retain gameplay state, or create a second loop or transport.
-- Do not add downstream Rust, Product Model, runtime composition authoring,
-  JSON invocation, handwritten ABI/P/Invoke, or a private scheduler.
+## Start here
 
-Read the adjacent Engine's `AGENTS.md`, `docs/architecture.md`, and
-`docs/csharp-sdk.md` before changing the product/Engine boundary.
+Read [README.md](README.md) for setup and commands and
+[docs/architecture.md](docs/architecture.md) for the current owners. Before
+changing the Engine boundary, read the Engine's `AGENTS.md`,
+`docs/architecture.md`, and `docs/csharp-sdk.md` in an explicitly identified
+source checkout (locally, `../rusty-engine`). Source is reference material;
+ordinary builds consume the installed package. Verify capabilities against the
+pinned SDK rather than assuming the source checkout and package are identical.
 
-## Source lanes
+The user request and owning task define scope and acceptance. If work is tied
+to Den, resolve that project's live guidance, task, and dependencies. Report
+failed reads; do not invent task state. Continue independently authorized work
+and pause only decisions that need unavailable authority.
 
-- `src/RustyTemplate.Game/` is ordinary safe C# product code. It references
-  the generated safe `Rusty.Engine` SDK and owns the counter domain.
-- `src/RustyTemplate.NativeProduct/` is the thin NativeAOT composition project.
-  Its assembly attribute selects the product; the Engine source generator
-  owns exports and ABI plumbing. Do not add gameplay or handwritten interop
-  there.
-- `src/ui/` contains only static/DOM UI. The Engine browser host owns the
-  canvas, renderer, and host input delivery.
+## Ownership and source
 
-Generated and intermediate output belongs under ignored build directories.
-The generated C# inputs are never edited or committed.
+- `src/RustyTemplate.Game/` owns counter state, application policy, semantic
+  input interpretation, and UI facts. Organize additions by product domain;
+  keep the product entry focused on explicit composition and lifecycle.
+- `Rusty.Engine` owns named Engine mechanisms: lifecycle/update admission,
+  input delivery, rendering/resources, spatial queries, content delivery,
+  persistence primitives, and host integration. Search the safe SDK and
+  existing product owners before adding a mechanism.
+- `src/ui/` is a DOM companion. It observes Engine projections and submits
+  semantic intents. Gameplay state, game rendering, canvas, transport, and
+  scheduling stay with their C#/Engine owners.
+- `content/` holds product-authored data. Interpret it in typed C# through
+  Engine content services. Keep authored definitions, live state, and transient
+  presentation distinct.
+- The SDK generates composition and interop under ignored `obj/` output.
+  Product code stays safe C#: no handwritten ABI/PInvoke, exports, raw native
+  access, downstream Rust, or checked-in composition projects.
 
-## Missing capabilities and evidence
+There is one Engine-admitted update path. Use its time/input facts; do not add
+another loop, clock, scheduler, renderer, or state authority downstream.
 
-If the safe generated Engine API cannot express a needed mechanism, name the
-exact upstream capability, file or link its Engine task when authorized, and
-stop. Do not invent a downstream substitute merely to complete the task.
+## Product style
 
-Use only focused evidence for the active change: a managed product build and
-NativeAOT publish are sufficient for this template. Do not revive the removed
-Product Model/browser verification gate or add broad tests and proof ceremony.
-Preserve unrelated work and never mutate the adjacent Engine checkout.
+Prefer ordinary readable C#, explicit composition, direct methods, and one
+clear mutable owner per domain. Keep operations thin: read, decide, apply,
+publish. Use typed boundaries where they help; do not introduce a framework,
+reflection discovery, generic bus, or service locator for hypothetical needs.
+
+Use nullable types, file-scoped namespaces, and `internal`/`sealed` defaults
+where the public product contract does not require otherwise. Keep structural
+constants beside their algorithm; give meaningful identities names. Put
+adjustable gameplay values and authored definitions in domain-owned content
+when the product needs tuning, rather than hiding them in call sites.
+
+Trust first-party runtime state and Engine-admitted data. Preserve concrete
+eligibility rules, current-data errors, and resource lifetime/disposal. Do not
+add repeated hashing, compatibility layers, whole-state rollback, or validation
+ceremony without a task-owned failure it prevents. Save meaningful values at
+explicit save boundaries; native handles and presentation resources are not
+product save state.
+
+## Engine dependencies and gaps
+
+`Directory.Build.props` owns the exact SDK/runtime pin. Install it with
+`./scripts/install-engine.sh`; deliberately advance it with
+`./scripts/install-engine.sh --update`, then run the focused checks. Keep exact
+versions in executable configuration and evidence, not duplicated in prose.
+Normal development uses the matched runtime pack through `rusty dev`.
+NativeAOT is an explicit fidelity/release check. Do not make an adjacent
+Engine checkout a build dependency or modify it as part of downstream work.
+
+If a required mechanism is missing, verify the safe API, name the blocked
+behavior and upstream owner, and file/link one narrow Engine request when
+that is authorized. Distinguish a missing mechanism or binding from a helper
+or documentation gap. Stop that dependent slice; continue independent work.
+Do not conceal the gap with a local substitute, fake success, or proof-only path.
+
+## Review and evidence
+
+Use [docs/agent-review/README.md](docs/agent-review/README.md). Every change gets
+an Engine-reuse and existing-product-reuse check; trivial changes may record
+that no mechanism is affected. Assign bounded independent lanes when review
+agents are requested or the task's review workflow calls for them. Keep the
+same reviewer for fix rounds and reconcile source-backed findings against the
+original task. Review is not an extra user-approval gate.
+
+`./scripts/build-csharp.sh` builds and stages the ordinary CoreCLR product.
+`./scripts/build-csharp.sh --aot` additionally publishes NativeAOT. Use focused
+semantic or interaction evidence only when it answers the changed behavior;
+do not add broad test gates to this small template. Distinguish build/staging,
+host launch, and visible interaction claims. Repeat passed checks only after
+material changes or an unresolved failure.
+
+Preserve unrelated edits. Keep generated output and installed artifacts
+ignored. Do not reset, force-push, or change adjacent repositories. Report what
+changed, relevant checks, and concrete limitations. Commit/push when requested
+or authorized by the active task; a review packet does not authorize publishing.
