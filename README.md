@@ -40,7 +40,10 @@ rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj
 ```
 
 `rusty update` lists the release notes to read; include the changed
-`Directory.Build.props` in the resulting source change. For an explicit
+`Directory.Build.props` in the resulting source change. This repository's
+`engine-pair` workflow does the same every six hours: it moves the pin only
+after the product builds and serves on the new pair, and otherwise opens an
+`engine-pair-update` issue with the build output and the notes to read. For an explicit
 NativeAOT fidelity/release check:
 
 ```bash
