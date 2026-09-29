@@ -1,4 +1,4 @@
-# Managed build output and SDK-generated product composition.
+# Managed build output and the SDK-staged product bundle.
 **/bin/
 **/obj/
 

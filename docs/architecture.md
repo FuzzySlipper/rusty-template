@@ -5,7 +5,7 @@
 ```text
 Counter state and policy (C#)
   -> Rusty.Engine safe SDK
-  -> SDK-generated composition and ABI
+  -> SDK-generated bind entry point and ABI
   -> packaged Rust host, input, UI transport, and browser shell
   -> DOM companion
 ```
@@ -23,7 +23,8 @@ Counter state and policy (C#)
 
 ## Lifecycle and data flow
 
-The installed runtime loads SDK-generated CoreCLR composition. Its bind checks
+The installed runtime loads the product assembly through its SDK-generated bind
+entry point. The bind checks
 the SDK/runtime ABI identity and constructs the product with
 `ProductCreateContext`. The product opens its UI stream through `IEngineContext.Ui`.
 
@@ -38,17 +39,16 @@ UI stream. Resource lifetimes and admitted update facts remain Engine-owned.
 
 ## Build and host
 
-`Directory.Build.props` selects one immutable SDK/runtime pair. The installer
-uses the release's verifier; `NuGet.Config` points at its installed SDK feed.
-The product's package reference supplies the public services and build targets.
-Generated bindings and composition are ignored output, never edited sources.
-
-The build script compiles and stages CoreCLR through
-`StageRustyEngineCoreClrProduct`. The run script invokes the matching pack's
-`rusty dev`, which owns staging, watching, worker replacement, and serving.
-`VerifyRustyEngineAot` publishes NativeAOT for explicit fidelity/release checks.
-The product supplies only its C#, DOM UI, and content; browser assets and
-transport come from the runtime pack.
+`Directory.Build.props` pins one immutable SDK/runtime pair. The Engine `rusty`
+command installs it into its shared cache (`rusty install`), supplies its
+package source to restores, and runs the product on its runtime (`rusty dev`,
+which owns staging, watching, worker replacement and serving). `rusty build`
+stages CoreCLR through `StageRustyEngineCoreClrProduct`; `rusty build --aot`
+runs `VerifyRustyEngineAot` for explicit fidelity/release checks. Generated
+bindings and the bind entry point are ignored output, never edited sources.
+The product supplies only its C#, DOM UI and content; browser assets and host
+binaries stay in the Engine runtime. The `engine-pair` workflow advances the
+pin only after the product builds and serves on the new pair.
 
 Before adding a mechanism, check both the installed safe SDK and the owners
 above. Product meaning stays downstream. A missing Engine capability is an

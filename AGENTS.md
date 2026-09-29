@@ -9,11 +9,11 @@ Rusty Engine projects. Keep it small enough to understand and customize.
 
 Read [README.md](README.md) for setup and commands and
 [docs/architecture.md](docs/architecture.md) for the current owners. Before
-changing the Engine boundary, read the Engine's `AGENTS.md`,
-`docs/architecture.md`, and `docs/csharp-sdk.md` in an explicitly identified
-source checkout (locally, `../rusty-engine`). Source is reference material;
-ordinary builds consume the installed package. Verify capabilities against the
-pinned SDK rather than assuming the source checkout and package are identical.
+changing the Engine boundary, read the Engine's
+[C# SDK guide](https://github.com/FuzzySlipper/rusty-engine/blob/main/docs/csharp-sdk.md)
+and architecture. `rusty --help` is the workflow reference. Ordinary builds
+consume the pinned package; verify capabilities against that pin (its release
+notes and API surface) rather than against Engine source at another revision.
 
 The user request and owning task define scope and acceptance. If work is tied
 to Den, resolve that project's live guidance, task, and dependencies. Report
@@ -35,7 +35,7 @@ and pause only decisions that need unavailable authority.
 - `content/` holds product-authored data. Interpret it in typed C# through
   Engine content services. Keep authored definitions, live state, and transient
   presentation distinct.
-- The SDK generates composition and interop under ignored `obj/` output.
+- The SDK generates the bind entry point and interop under ignored `obj/` output.
   Product code stays safe C#: no handwritten ABI/PInvoke, exports, raw native
   access, downstream Rust, or checked-in composition projects.
 

@@ -62,8 +62,9 @@ rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj --aot
 | `docs/ui.md` | DOM companion contract |
 | `docs/agent-review/` | Reusable review workflow and lane packets |
 
-The SDK generates CoreCLR/NativeAOT composition beneath `obj/`. The runtime
-pack supplies the browser shell. Product metadata, input intents, content/UI
+The SDK generates the product's bind entry point inside its ordinary build;
+there is no composition project. The Engine runtime supplies the host and
+browser shell. Product metadata, input intents, content/UI
 roots, and projection identity live in the ordinary `.csproj`.
 
 ## Start a product from this template
