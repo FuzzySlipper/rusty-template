@@ -6,41 +6,45 @@ The packaged Engine owns the host, input, update loop, and browser shell.
 
 ## Setup
 
-The supported runtime pair targets Linux x64. Install the .NET 10 SDK, GitHub
-CLI (`gh`, authenticated for release access), `jq`, `tar`, `unzip`, and standard shell
-utilities. NativeAOT also needs the platform compiler/linker prerequisites
-(Clang and zlib development headers on Linux).
+The supported runtime pair targets Linux x64. Install the .NET 10 SDK, `curl`
+and `tar`. NativeAOT also needs the platform compiler/linker prerequisites
+(Clang and zlib development headers on Linux). Get the Engine's `rusty`
+command once:
 
 ```bash
-./scripts/install-engine.sh
-./scripts/build-csharp.sh
-./scripts/run-csharp.sh --port 8787
+curl -fsSL https://raw.githubusercontent.com/FuzzySlipper/rusty-engine/main/scripts/install-rusty.sh | bash
+```
+
+Then, from this repository:
+
+```bash
+rusty status
+rusty install
+rusty dev --project src/RustyTemplate.Game/RustyTemplate.Game.csproj --port 8787
 ```
 
 Open the URL printed by the host. The Increment button changes the counter.
-The runner delegates to the installed `rusty dev`: CoreCLR loads the product,
-and changes to declared C#, UI, or content inputs rebuild and restart it.
-Runtime options such as `--bind-host`, `--live-debug`, and `--debugger` pass
-through to `rusty dev`.
+`rusty dev` runs the pinned pair's runtime: CoreCLR loads the product, and
+changes to declared C#, UI, or content inputs rebuild and reload it. See
+`rusty dev --help` for `--bind-host`, `--live-debug`, and `--debugger`.
 
-The installer downloads and verifies the immutable SDK/runtime pair pinned in
-`Directory.Build.props`. NuGet resolves the SDK from `.runtime/sdk-feed`; the
-runner selects the same version under `.runtime/pairs/`. No Engine source
-checkout is required. Installed artifacts are local, ignored output.
+`Directory.Build.props` pins the exact SDK/runtime pair. `rusty install`
+downloads it once into the shared Engine cache, and later builds and runs work
+offline. No Engine source checkout is required.
 
 To adopt the newest published pair deliberately:
 
 ```bash
-./scripts/install-engine.sh --update
-./scripts/build-csharp.sh
+rusty update
+rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj
 ```
 
-The pin changes only after successful installation. Include
+`rusty update` lists the release notes to read; include the changed
 `Directory.Build.props` in the resulting source change. For an explicit
 NativeAOT fidelity/release check:
 
 ```bash
-./scripts/build-csharp.sh --aot
+rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj --aot
 ```
 
 ## Repository shape
@@ -51,7 +55,6 @@ NativeAOT fidelity/release check:
 | `src/ui/main.js` | DOM presentation and semantic input |
 | `content/` | Product-authored content root |
 | `Directory.Build.props` | Matched Engine SDK/runtime pin |
-| `scripts/` | Install, build/stage, and development commands |
 | `docs/architecture.md` | Current ownership and data flow |
 | `docs/ui.md` | DOM companion contract |
 | `docs/agent-review/` | Reusable review workflow and lane packets |
@@ -62,8 +65,8 @@ roots, and projection identity live in the ordinary `.csproj`.
 
 ## Start a product from this template
 
-1. Rename the C# directory/project, namespace, and entry type together. Update
-   the project path in the build/run scripts.
+1. Rename the C# directory/project, namespace, and entry type together, and use
+   the new project path with `rusty dev` and `rusty build`.
 2. Set the product ID/title and UI projection stream/contract in the project
    file. Keep the C# stream/contract constants aligned. Define semantic intents
    there and keep their C#/DOM callers aligned.

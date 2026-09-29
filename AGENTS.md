@@ -65,8 +65,9 @@ product save state.
 ## Engine dependencies and gaps
 
 `Directory.Build.props` owns the exact SDK/runtime pin. Install it with
-`./scripts/install-engine.sh`; deliberately advance it with
-`./scripts/install-engine.sh --update`, then run the focused checks. Keep exact
+`rusty install`; deliberately advance it with `rusty update`, read the release
+notes it lists, then run the focused checks. `rusty status` reports the pin,
+installation and missing prerequisites. Keep exact
 versions in executable configuration and evidence, not duplicated in prose.
 Normal development uses the matched runtime pack through `rusty dev`.
 NativeAOT is an explicit fidelity/release check. Do not make an adjacent
@@ -87,8 +88,8 @@ agents are requested or the task's review workflow calls for them. Keep the
 same reviewer for fix rounds and reconcile source-backed findings against the
 original task. Review is not an extra user-approval gate.
 
-`./scripts/build-csharp.sh` builds and stages the ordinary CoreCLR product.
-`./scripts/build-csharp.sh --aot` additionally publishes NativeAOT. Use focused
+`rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj` builds
+and stages the ordinary CoreCLR product; `--aot` additionally publishes NativeAOT. Use focused
 semantic or interaction evidence only when it answers the changed behavior;
 do not add broad test gates to this small template. Distinguish build/staging,
 host launch, and visible interaction claims. Repeat passed checks only after
