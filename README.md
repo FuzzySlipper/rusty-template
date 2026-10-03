@@ -6,13 +6,19 @@ The packaged Engine owns the host, input, update loop, and browser shell.
 
 ## Setup
 
-The supported runtime pair targets Linux x64. Install the .NET 10 SDK, `curl`
+Engine pairs target Linux x64 and Windows x64. Install the .NET 10 SDK, `curl`
 and `tar`. NativeAOT also needs the platform compiler/linker prerequisites
 (Clang and zlib development headers on Linux). Get the Engine's `rusty`
 command once:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/FuzzySlipper/rusty-engine/main/scripts/install-rusty.sh | bash
+```
+
+On Windows, in PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/FuzzySlipper/rusty-engine/main/scripts/install-rusty.ps1 | iex
 ```
 
 Then, from this repository:
