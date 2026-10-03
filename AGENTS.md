@@ -88,7 +88,7 @@ agents are requested or the task's review workflow calls for them. Keep the
 same reviewer for fix rounds and reconcile source-backed findings against the
 original task. Review is not an extra user-approval gate.
 
-`rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj` builds
+`rusty build` builds the default project `Directory.Build.props` names
 and stages the ordinary CoreCLR product; `--aot` additionally publishes NativeAOT. Use focused
 semantic or interaction evidence only when it answers the changed behavior;
 do not add broad test gates to this small template. Distinguish build/staging,

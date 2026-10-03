@@ -20,7 +20,7 @@ Then, from this repository:
 ```bash
 rusty status
 rusty install
-rusty dev --project src/RustyTemplate.Game/RustyTemplate.Game.csproj --port 8787
+rusty dev --port 8787
 ```
 
 Open the URL printed by the host. The Increment button changes the counter.
@@ -28,7 +28,9 @@ Open the URL printed by the host. The Increment button changes the counter.
 changes to declared C#, UI, or content inputs rebuild and reload it. See
 `rusty dev --help` for `--bind-host`, `--live-debug`, and `--debugger`.
 
-`Directory.Build.props` pins the exact SDK/runtime pair. `rusty install`
+`Directory.Build.props` pins the exact SDK/runtime pair and names the product
+project (`<RustyEngineProject>`) that `rusty dev` and `rusty build` use without
+`--project`. `rusty install`
 downloads it once into the shared Engine cache, and later builds and runs work
 offline. No Engine source checkout is required.
 
@@ -36,7 +38,7 @@ To adopt the newest published pair deliberately:
 
 ```bash
 rusty update
-rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj
+rusty build
 ```
 
 `rusty update` lists the release notes to read; include the changed
@@ -47,7 +49,7 @@ after the product builds and serves on the new pair, and otherwise opens an
 NativeAOT fidelity/release check:
 
 ```bash
-rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj --aot
+rusty build --aot
 ```
 
 ## Repository shape
@@ -57,7 +59,7 @@ rusty build --project src/RustyTemplate.Game/RustyTemplate.Game.csproj --aot
 | `src/RustyTemplate.Game/` | Ordinary safe C# product, counter state, and product metadata |
 | `src/ui/main.js` | DOM presentation and semantic input |
 | `content/` | Product-authored content root |
-| `Directory.Build.props` | Matched Engine SDK/runtime pin |
+| `Directory.Build.props` | Matched Engine SDK/runtime pin and default product project |
 | `docs/architecture.md` | Current ownership and data flow |
 | `docs/ui.md` | DOM companion contract |
 | `docs/agent-review/` | Reusable review workflow and lane packets |
@@ -70,7 +72,7 @@ roots, and projection identity live in the ordinary `.csproj`.
 ## Start a product from this template
 
 1. Rename the C# directory/project, namespace, and entry type together, and use
-   the new project path with `rusty dev` and `rusty build`.
+   the new project path in `<RustyEngineProject>` in `Directory.Build.props`.
 2. Set the product ID/title and UI projection stream/contract in the project
    file. Keep the C# stream/contract constants aligned. Define semantic intents
    there and keep their C#/DOM callers aligned.
