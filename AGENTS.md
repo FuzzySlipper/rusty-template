@@ -73,6 +73,14 @@ Normal development uses the matched runtime pack through `rusty dev`.
 NativeAOT is an explicit fidelity/release check. Do not make an adjacent
 Engine checkout a build dependency or modify it as part of downstream work.
 
+The product builds and runs on Windows and Linux. Anything `rusty dev` or
+`rusty build` runs (a UI build command, an `Exec`, a step the README puts
+before `rusty dev`) must work under both `cmd.exe` and `/bin/sh`: one
+`npm`/`pnpm`/`node` invocation with quoted paths, MSBuild `Copy`/`MakeDir`
+for files, no `bash`, shell utilities or absolute machine paths. Generated
+output stays under `obj/` or an ignored directory. Linux-only tooling is named
+as such and kept off that path.
+
 If a required mechanism is missing, verify the safe API, name the blocked
 behavior and upstream owner, and file/link one narrow Engine request when
 that is authorized. Distinguish a missing mechanism or binding from a helper
